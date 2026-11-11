@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy Birthday</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+   <link href="https://fonts.googleapis.com/css2?family=Yomogi&text=HappyBirthdayお誕生日おめでとう新しい1年がたくさんの笑顔であふれますようにタップしてひらいてね/&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+<main class="stage" id="stage">
+  <div class="page" id="page"></div>
+
+  <nav class="controls" id="controls">
+    <button class="nav" id="prev" aria-label="前のページ">‹</button>
+    <p class="counter" id="counter"></p>
+    <button class="nav" id="next" aria-label="次のページ">›</button>
+  </nav>
+</main>
+
+<div class="book-wrap" id="bookWrap">
+  <div class="book" id="book">
+    <div class="half left" id="left"></div>
+    <div class="half right" id="right"></div>
+    <div class="sheet" id="sheet">
+      <div class="face front" id="front">
+        <!-- 表紙の絵（表紙のときだけ表示） -->
+        <div class="cover-art">
+          <p class="cover-title">Happy Birthday</p>
+          <svg class="cover-cake" viewBox="0 25 200 182" aria-hidden="true">
+            <g fill="#fff" opacity="0.9">
+              <path transform="translate(22,52)" d="M0,-7 L1.8,-1.8 L7,0 L1.8,1.8 L0,7 L-1.8,1.8 L-7,0 L-1.8,-1.8Z"/>
+              <path transform="translate(176,40)" d="M0,-6 L1.5,-1.5 L6,0 L1.5,1.5 L0,6 L-1.5,1.5 L-6,0 L-1.5,-1.5Z"/>
+              <path transform="translate(168,96)" d="M0,-4 L1,-1 L4,0 L1,1 L0,4 L-1,1 L-4,0 L-1,-1Z"/>
+              <path transform="translate(36,98)" d="M0,-4 L1,-1 L4,0 L1,1 L0,4 L-1,1 L-4,0 L-1,-1Z"/>
+            </g>
+            <ellipse cx="100" cy="190" rx="88" ry="12" fill="#fff" opacity="0.9"/>
+            <rect x="30" y="120" width="140" height="68" rx="10" fill="#fff3e0"/>
+            <path d="M30,130 Q30,120 40,120 H160 Q170,120 170,130 V138 Q164,146 158,138 Q152,150 144,138 Q136,144 128,138 Q120,152 112,138 Q104,144 96,138 Q88,150 80,138 Q72,144 64,138 Q56,150 48,138 Q40,144 30,138 Z" fill="#fff"/>
+            <g fill="#ffc1d0">
+              <circle cx="50" cy="166" r="4"/><circle cx="75" cy="166" r="4"/><circle cx="100" cy="166" r="4"/><circle cx="125" cy="166" r="4"/><circle cx="150" cy="166" r="4"/>
+            </g>
+            <g transform="translate(42,113)">
+              <path d="M0,-6 Q7,-6 6,2 Q4,9 0,10 Q-4,9 -6,2 Q-7,-6 0,-6Z" fill="#e8403f"/>
+              <path d="M-4,-6 L0,-9 L4,-6 L0,-4Z" fill="#5bb36a"/>
+            </g>
+            <g transform="translate(158,113)">
+              <path d="M0,-6 Q7,-6 6,2 Q4,9 0,10 Q-4,9 -6,2 Q-7,-6 0,-6Z" fill="#e8403f"/>
+              <path d="M-4,-6 L0,-9 L4,-6 L0,-4Z" fill="#5bb36a"/>
+            </g>
+            <rect x="55" y="76" width="90" height="44" rx="8" fill="#ffc1d0"/>
+            <path d="M55,84 Q55,76 63,76 H137 Q145,76 145,84 V90 Q139,98 133,90 Q125,100 117,90 Q109,96 101,90 Q93,100 85,90 Q77,96 69,90 Q62,98 55,90 Z" fill="#fff"/>
+            <rect x="77" y="52" width="6" height="24" rx="2" fill="#a8c5f0"/>
+            <rect x="97" y="48" width="6" height="28" rx="2" fill="#ffd36e"/>
+            <rect x="117" y="52" width="6" height="24" rx="2" fill="#9ad0c2"/>
+            <g stroke="#555" stroke-width="1.2">
+              <line x1="80" y1="52" x2="80" y2="48"/><line x1="100" y1="48" x2="100" y2="44"/><line x1="120" y1="52" x2="120" y2="48"/>
+            </g>
+            <g class="flame" transform="translate(80,48)">
+              <path d="M0,0 C-5,-6 -4,-12 0,-18 C4,-12 5,-6 0,0Z" fill="#ffb703"/>
+              <path d="M0,-1 C-2.5,-4 -2,-8 0,-11 C2,-8 2.5,-4 0,-1Z" fill="#fff3b0"/>
+            </g>
+            <g class="flame" transform="translate(100,44)">
+              <path d="M0,0 C-5,-6 -4,-12 0,-18 C4,-12 5,-6 0,0Z" fill="#ffb703"/>
+              <path d="M0,-1 C-2.5,-4 -2,-8 0,-11 C2,-8 2.5,-4 0,-1Z" fill="#fff3b0"/>
+            </g>
+            <g class="flame" transform="translate(120,48)">
+              <path d="M0,0 C-5,-6 -4,-12 0,-18 C4,-12 5,-6 0,0Z" fill="#ffb703"/>
+              <path d="M0,-1 C-2.5,-4 -2,-8 0,-11 C2,-8 2.5,-4 0,-1Z" fill="#fff3b0"/>
+            </g>
+          </svg>
+          <p class="hint">タップしてひらいてね</p>
+        </div>
+      </div>
+      <div class="face back" id="back"></div>
+    </div>
+  </div>
+</div>
+<script type="module" src="/src/main.js"></script>
+  </body>
+</html>

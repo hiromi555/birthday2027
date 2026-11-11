@@ -1,0 +1,141 @@
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; }
+
+body {
+  font-family: "Yomogi", sans-serif;
+  transition: background-color 0.8s ease;
+  overflow: hidden;
+}
+
+.stage {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  justify-items: center;
+  padding: 2rem 1rem 1.5rem;
+}
+
+/* 文字 */
+.page { align-self: center; opacity: 0; }
+.page.show { animation: fadeIn 0.6s ease forwards; }
+.text {
+  font-size: clamp(2.2rem, 11vw, 3.2rem);
+  color: #333;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.book-wrap {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  perspective: 1400px;   /* ← 追加 */
+}
+.book-wrap.visible { opacity: 1; }
+
+.book {
+  --w: 200px;
+  --h: 400px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--w) * 2);
+  height: var(--h);
+  transform: translate(-50%, -50%) rotateX(50deg) scale(1);
+  transform-style: preserve-3d;
+}
+.half {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+.half.left  { left: 0;  border-radius: 8px 0 0 8px; }
+.half.right { right: 0; border-radius: 0 8px 8px 0; }
+
+/* めくれる紙 */
+.sheet {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  display: none;
+}
+.sheet.flipping { display: block; }
+.face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+.front { border-radius: 0 8px 8px 0; }
+.back  { transform: rotateY(180deg); border-radius: 8px 0 0 8px; }
+
+/* 矢印とページ番号（本が開くまで隠す） */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.controls.visible { opacity: 1; }
+.nav {
+  border: none;
+  background: none;
+  font-size: 2.5rem;
+  color: #333;
+  cursor: pointer;
+}
+.nav:disabled { opacity: 0.2; cursor: default; }
+.counter { font-size: 0.9rem; color: #333; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 閉じているときだけ、本をタップできるように */
+.book-wrap.closed {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* 表紙の絵（表紙のときだけ表示） */
+.cover-art {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px 16px;
+  color: #fff;
+  text-align: center;
+}
+.sheet.is-cover .cover-art { display: flex; }
+.cover-title { font-size: 26px; line-height: 1.3; }
+.cover-cake { width: 78%; height: auto; }
+
+/* 「タップしてひらいてね」（閉じているときだけ点滅） */
+.hint {
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.book-wrap.closed .hint {
+  opacity: 1;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink {
+  50% { opacity: 0.4; }
+}
+
+/* 最後のページの「とじる」ボタン */
+.nav.close { font-size: 1.3rem; }
