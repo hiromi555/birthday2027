@@ -10,6 +10,7 @@
   </head>
   <body>
 <main class="stage" id="stage">
+  <svg class="fx" id="fx"></svg>
   <div class="page" id="page"></div>
 
   <nav class="controls" id="controls">
@@ -22,7 +23,7 @@
 <div class="book-wrap" id="bookWrap">
   <div class="book" id="book">
     <div class="half left" id="left"></div>
-    <div class="half right" id="right"></div>
+   <div class="half right" id="right"><p class="leaf-text" id="rightText"></p></div>
     <div class="sheet" id="sheet">
       <div class="face front" id="front">
         <!-- 表紙の絵（表紙のときだけ表示） -->
@@ -72,7 +73,9 @@
           </svg>
           <p class="hint">タップしてひらいてね</p>
         </div>
+        <p class="leaf-text" id="frontText"></p>
       </div>
+
       <div class="face back" id="back"></div>
     </div>
   </div>

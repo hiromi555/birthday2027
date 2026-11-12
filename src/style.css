@@ -20,7 +20,7 @@ body {
 .page.show { animation: fadeIn 0.6s ease forwards; }
 .text {
   font-size: clamp(2.2rem, 11vw, 3.2rem);
-  color: #333;
+  color: var(--ink, #333);
   text-align: center;
   line-height: 1.4;
 }
@@ -89,11 +89,11 @@ body {
   border: none;
   background: none;
   font-size: 2.5rem;
-  color: #333;
+  color: var(--ink, #333);
   cursor: pointer;
 }
 .nav:disabled { opacity: 0.2; cursor: default; }
-.counter { font-size: 0.9rem; color: #333; }
+.counter { font-size: 0.9rem; color: var(--ink, #333); }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
@@ -139,3 +139,25 @@ body {
 
 /* 最後のページの「とじる」ボタン */
 .nav.close { font-size: 1.3rem; }
+
+
+/* エフェクト用のSVG（画面全体・クリックは素通り） */
+.fx {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.page { position: relative; z-index: 1; }  /* 文字はエフェクトより手前 */
+
+/* 本のページに印刷された言葉 */
+.half, .face { display: grid; place-items: center; }
+.leaf-text {
+  font-size: 18px;
+  color: #333;
+  text-align: center;
+  line-height: 1.4;
+  padding: 0 16px;
+}
+.sheet.is-cover .leaf-text { display: none; }  /* 表紙のときは出さない */
