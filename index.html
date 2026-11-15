@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Happy Birthday</title>
+    <!-- 準備ができるまで中身を隠す（素のHTMLが一瞬見えるのを防ぐ） -->
+    <style>
+      html { background: #F4EBD9; }
+      body:not(.ready) { visibility: hidden; }
+      body:not(.ready) * { transition: none !important; }
+    </style>
   </head>
   <body>
 <main class="stage" id="stage">

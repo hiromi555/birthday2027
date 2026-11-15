@@ -68,13 +68,11 @@ function playCoverIntro() {
   const w = coverTitle.getBoundingClientRect().width
   const big = (innerWidth * 0.95) / w
 
+  gsap.set(coverTitle, { scale: big, opacity: 0 })   // 大きい状態からスタート
   gsap.timeline()
-    .from(coverTitle, { scale: big, opacity: 0, duration: 0.25, ease: 'power1.out' })
-    .to(coverTitle, { scale: big, duration: 0.5 })          // 大きいまま少し見せる
-    .to(coverTitle, { scale: 1, duration: 0.6, ease: 'back.out(1.6)' }) // ドンと収まる
+    .to(coverTitle, { opacity: 1, duration: 0.25, ease: 'power1.out' })   // パッと出る
+    .to(coverTitle, { scale: 1, duration: 0.6, ease: 'back.out(1.6)' }, '+=0.5') // 少し見せてから、ドンと収まる
 }
-// フォントが読み込めてから測る（先に測ると大きさがずれる）
-document.fonts.ready.then(playCoverIntro)
 
 // エフェクトを片付ける
 let fxCtx = null
@@ -332,4 +330,12 @@ addEventListener('resize', () => {
   if (state === 'closed' && !busy) book.style.transform = coverView()
 })
 
-showCover()
+// フォントが読み込めたら、表紙を置いて、画面を見せて、タイトルを動かす
+Promise.all([
+  document.fonts.load('38px "Bangers"', 'HAPPY'),
+  document.fonts.load('11px "Dela Gothic One"', 'タップ'),
+]).finally(() => {
+  showCover()
+  document.body.classList.add('ready')
+  playCoverIntro()
+})
