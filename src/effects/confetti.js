@@ -1,26 +1,34 @@
 import { gsap } from 'gsap'
 
 const NS = 'http://www.w3.org/2000/svg'
-const COLORS = ['#ffffff', '#ffd36e', '#e06c8c', '#9ad0c2', '#a8c5f0']
+// ポップアートの色（黄色の背景で見えるように、黄色は入れない）
+const COLORS = ['#E63B2E', '#E63B2E', '#2CA5D9', '#2CA5D9', '#ffffff', '#111111']
 
 // 紙吹雪：真ん中からポンッと弾けて、ひらひら落ちる
-export function confetti(svg, accent = '#fff') {
+// 1つずつ黒い線でフチ取りして、コミックっぽく
+export function confetti(svg) {
   const { width, height } = svg.getBoundingClientRect()
   const cx = width / 2
   const cy = height / 2
   const r = gsap.utils.random
 
-  for (let i = 0; i < 80; i++) {
-    // 丸・四角・三角のどれかを作る
-    const type = r(['circle', 'rect', 'polygon'])
-    const el = document.createElementNS(NS, type)
-    if (type === 'circle') el.setAttribute('r', r(4, 8))
+  for (let i = 0; i < 70; i++) {
+    // 丸・四角・三角・星のどれかを作る
+    const type = r(['circle', 'rect', 'polygon', 'star'])
+    const el = document.createElementNS(NS, type === 'star' ? 'polygon' : type)
+    if (type === 'circle') el.setAttribute('r', r(5, 9))
     if (type === 'rect') {
-      el.setAttribute('width', r(6, 12))
-      el.setAttribute('height', r(6, 12))
+      el.setAttribute('width', r(8, 14))
+      el.setAttribute('height', r(8, 14))
     }
-    if (type === 'polygon') el.setAttribute('points', '0,-8 7,6 -7,6')
-    el.setAttribute('fill', r([accent, accent, ...COLORS]))
+    if (type === 'polygon') el.setAttribute('points', '0,-9 8,7 -8,7')
+    if (type === 'star') el.setAttribute('points', '0,-11 3,-3 11,-3 5,2 7,10 0,5 -7,10 -5,2 -11,-3 -3,-3')
+
+    const fill = r(COLORS)
+    el.setAttribute('fill', fill)
+    el.setAttribute('stroke', fill === '#111111' ? '#ffffff' : '#111111') // 黒い紙だけ白フチ
+    el.setAttribute('stroke-width', 2.5)
+    el.setAttribute('stroke-linejoin', 'round')
     svg.appendChild(el)
 
     // 飛んでいく方向と距離
@@ -33,7 +41,7 @@ export function confetti(svg, accent = '#fff') {
       .to(el, {
         x: cx + Math.cos(angle) * dist,
         y: cy + Math.sin(angle) * dist,
-        scale: r(1, 2),
+        scale: r(1, 1.8),
         rotation: r(-360, 360),
         duration: r(0.6, 1),
         ease: 'power3.out',

@@ -4,6 +4,9 @@ html, body { height: 100%; }
 
 body {
   font-family: var(--font-pop);
+  /* ページごとのドット（色は pages.js の dot で指定） */
+  background-image: radial-gradient(var(--page-dot, transparent) 26%, transparent 28%);
+  background-size: 16px 16px;
   transition: background-color 0.8s ease;
   overflow: hidden;
 }
@@ -20,11 +23,15 @@ body {
 .page { align-self: center; opacity: 0; }
 .page.show { animation: fadeIn 0.6s ease forwards; }
 .text {
-  font-size: clamp(2.2rem, 11vw, 3.2rem);
-  color: var(--ink, #333);
+  font-size: clamp(2.6rem, 13vw, 5.5rem);
+  color: #fff;
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.1;
+  padding: 0 0.5rem;
+  -webkit-text-stroke-width: 2.5px;          /* 中のページは表紙より太めのフチ */
+  text-shadow: 5px 5px 0 var(--pop-black);
 }
+.text .char { display: inline-block; }       /* 1文字ずつ動かす用 */
 
 .book-wrap {
   position: fixed;

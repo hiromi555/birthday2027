@@ -4,6 +4,7 @@ import './style.css'
 import { gsap } from 'gsap'
 import { pages } from './pages.js'
 import { effects } from './effects/index.js'
+import { textFx } from './textfx.js'
 
 const $ = (id) => document.getElementById(id)
 const pageEl = $('page'), counterEl = $('counter'), controls = $('controls')
@@ -36,6 +37,12 @@ function zoomView() {
   const s = 2.5  // どれだけ寄るか
   const shift = (s * book.offsetWidth) / 4
   return `translate(calc(-50% - ${shift}px), -50%) rotateX(0deg) scale(${s})`
+}
+
+// 背景の色とドットをまとめて変える（ドットなしなら dot を省略）
+function setBg(color, dot) {
+  document.body.style.backgroundColor = color
+  document.body.style.setProperty('--page-dot', dot || 'transparent')
 }
 
 const light = (c) => `color-mix(in srgb, ${c} 65%, white)`
@@ -86,19 +93,23 @@ function render() {
   const { text, color } = pages[current]
   pageEl.innerHTML = ''
   const p = document.createElement('p')
-  p.className = 'text'
+  p.className = 'text pop-outline'
   p.textContent = text
   pageEl.appendChild(p)
   pageEl.classList.remove('show')
   void pageEl.offsetWidth
   pageEl.classList.add('show')
 
-  // 前のエフェクトを片付けて、このページのエフェクトを再生
+  // 前のエフェクトを片付けて、このページのエフェクトと文字の動きを再生
   clearFx()
   const play = effects[pages[current].effect]
-  if (play) fxCtx = gsap.context(() => play(fxEl, pages[current].accent))
+  const moveText = textFx[pages[current].textFx]
+  fxCtx = gsap.context(() => {
+    if (play) play(fxEl, pages[current].accent)
+    if (moveText) moveText(p)
+  })
 
-  document.body.style.backgroundColor = color
+  setBg(color, pages[current].dot)
   document.body.style.setProperty('--ink', pages[current].ink || '#333')
   counterEl.textContent = `${current + 1} / ${pages.length}`
   prevBtn.disabled = current === 0
@@ -176,7 +187,7 @@ function resetBook() {
 
 // 最初の画面：真上から見た大きな表紙
 function showCover() {
-  document.body.style.backgroundColor = START_BG
+  setBg(START_BG)
   leftEl.style.visibility = 'hidden'
   frontEl.style.background = COVER
   sheet.classList.add('is-cover')
@@ -223,7 +234,7 @@ async function closeBook() {
   const color = pages[current].color
 
   controls.classList.remove('visible')
-  document.body.style.backgroundColor = START_BG
+  setBg(START_BG)
   pageEl.classList.remove('show')
   clearFx()
   leftEl.style.background = light(color)
@@ -291,7 +302,7 @@ async function go(to) {
 
   pageEl.classList.remove('show')
   clearFx()
-  document.body.style.backgroundColor = START_BG
+  setBg(START_BG)
   sheet.classList.remove('is-cover')
   prepareSheet(forward)
   await zoomOut()
