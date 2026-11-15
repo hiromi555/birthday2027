@@ -1,5 +1,5 @@
 import { confetti } from './confetti.js'
-import { ripple } from './ripple.js'
+import { shootingStars } from './shooting-stars.js'
 import { stars } from './stars.js'
 import { lines } from './lines.js'
 import { future } from './future.js'
@@ -12,7 +12,7 @@ import { bang } from './bang.js'
 
 export const effects = {
   confetti,
-  ripple,
+  shootingStars,
   stars,
   lines,
   future,
