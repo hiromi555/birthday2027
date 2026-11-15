@@ -11,6 +11,7 @@ import { fireworks } from './fireworks.js'
 import { bang } from './bang.js'
 import { spaceAge } from './space-age.js'
 import { smileys } from './smileys.js'
+import { popFireworks } from './pop-fireworks.js'
 
 export const effects = {
   confetti,
@@ -26,4 +27,5 @@ export const effects = {
   bang,
   spaceAge,
   smileys,
+  popFireworks,
 }

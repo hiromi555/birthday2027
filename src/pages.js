@@ -8,5 +8,5 @@ export const pages = [
   { text: 'おめでとう',         color: '#E63B2E', dot: '#C42E22', effect: 'bang',     textFx: 'bang' },
   { text: '新しい１年も',       color: '#1B2A5C', dot: '#26397A', effect: 'spaceAge', textFx: 'zoom' },
   { text: '笑顔いっぱいで',     color: '#F4EBD9', dot: '#F0C9B8', effect: 'smileys',  textFx: 'hop', textColor: '#E63B2E' },
-  { text: 'Have a great year!', color: '#1b2a5c', ink: '#ffffff', effect: 'fireworks' },
+  { text: 'Have a great year!', color: '#1B2A5C', dot: '#26397A', effect: 'popFireworks', textFx: 'stamp' },
 ]

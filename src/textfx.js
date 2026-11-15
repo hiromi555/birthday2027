@@ -74,4 +74,24 @@ export const textFx = {
         stagger: 0.08,
       }, '+=0.1')
   },
+
+  // フィナーレ：1語ずつ、大きいところからドン、ドン、ドンと押し付けて、最後にみんなで揺れて止まる
+  stamp(el) {
+    const { words } = SplitText.create(el, { type: 'words', wordsClass: 'char' })
+    gsap.timeline({ delay: 0.2 })
+      .from(words, {
+        scale: 3,
+        opacity: 0,
+        rotation: () => gsap.utils.random(-15, 15),
+        duration: 0.35,
+        ease: 'power4.in',
+        stagger: 0.35,
+      })
+      .to(words, {
+        keyframes: [{ rotation: -6 }, { rotation: 6 }, { rotation: -3 }, { rotation: 0 }],
+        duration: 0.6,
+        ease: 'sine.inOut',
+        stagger: 0.05,
+      }, '+=0.15')
+  },
 }
