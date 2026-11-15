@@ -1,8 +1,9 @@
+@import "./styles/pop.css";
 * { box-sizing: border-box; margin: 0; }
 html, body { height: 100%; }
 
 body {
-  font-family: "Yomogi", sans-serif;
+  font-family: var(--font-pop);
   transition: background-color 0.8s ease;
   overflow: hidden;
 }
@@ -35,6 +36,13 @@ body {
 }
 .book-wrap.visible { opacity: 1; }
 
+/* 本が見えているときの背景：紙色に青いドット */
+.book-wrap {
+  --dot-color: color-mix(in srgb, var(--pop-blue) 35%, transparent);
+  --dot-size: 14px;
+}
+.book-wrap.pop-dots { background-color: transparent; }
+
 .book {
   --w: 200px;
   --h: 400px;
@@ -51,10 +59,10 @@ body {
   top: 0;
   width: 50%;
   height: 100%;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: var(--line);
 }
-.half.left  { left: 0;  border-radius: 8px 0 0 8px; }
-.half.right { right: 0; border-radius: 0 8px 8px 0; }
+.half.left  { left: 0;  border-radius: 4px 0 0 4px; }
+.half.right { right: 0; border-radius: 0 4px 4px 0; }
 
 /* めくれる紙 */
 .sheet {
@@ -73,8 +81,9 @@ body {
   inset: 0;
   backface-visibility: hidden;
 }
-.front { border-radius: 0 8px 8px 0; }
-.back  { transform: rotateY(180deg); border-radius: 8px 0 0 8px; }
+.face { border: var(--line); }
+.front { border-radius: 0 4px 4px 0; }
+.back  { transform: rotateY(180deg); border-radius: 4px 0 0 4px; }
 
 /* 矢印とページ番号（本が開くまで隠す） */
 .controls {
@@ -113,28 +122,76 @@ body {
   display: none;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding: 24px 16px;
-  color: #fff;
+  justify-content: space-evenly;
+  padding: 16px 10px 20px;
   text-align: center;
+  /* 赤い表紙に濃い赤のドット */
+  background-color: var(--pop-red);
+  --dot-color: var(--pop-red-dk);
+  --dot-size: 8px;
+  background-image: radial-gradient(var(--dot-color) 28%, transparent 30%);
+  background-size: var(--dot-size) var(--dot-size);
 }
 .sheet.is-cover .cover-art { display: flex; }
-.cover-title { font-size: 26px; line-height: 1.3; }
-.cover-cake { width: 78%; height: auto; }
+
+/* タイトル（爆発フキダシの上に文字） */
+.cover-head {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+.cover-burst { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cover-title {
+  position: relative;
+  font-family: "Bangers", sans-serif;
+  font-weight: 400;
+  font-size: 38px;
+  line-height: 0.95;
+  letter-spacing: 1px;
+  color: #fff;
+  transform: rotate(-6deg);
+}
+.cover-title .char { display: inline-block; }   /* 1文字ずつ動かす用 */
+.cover-cake { width: 92%; height: auto; overflow: visible; }
 
 /* 「タップしてひらいてね」（閉じているときだけ点滅） */
 .hint {
-  font-size: 12px;
+  position: relative;
+  font-family: "Dela Gothic One", sans-serif;
+  font-size: 11px;
+  color: var(--pop-black);
+  background: #fff;
+  border: 3px solid var(--pop-black);
+  border-radius: 999px;
+  padding: 6px 12px;
+  box-shadow: 3px 3px 0 var(--pop-black);
   opacity: 0;
   transition: opacity 0.4s ease;
 }
+/* フキダシのしっぽ */
+.hint::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  top: -11px;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-left: 3px solid var(--pop-black);
+  border-top: 3px solid var(--pop-black);
+  transform: skewX(25deg) rotate(20deg);
+}
 .book-wrap.closed .hint {
   opacity: 1;
-  animation: blink 2s ease-in-out infinite;
+  animation: boing 1.6s ease-in-out infinite;
 }
-@keyframes blink {
-  50% { opacity: 0.4; }
+/* 点滅のかわりに、ピョコッと跳ねる */
+@keyframes boing {
+  0%, 60%, 100% { transform: translateY(0) scale(1); }
+  70% { transform: translateY(-5px) scale(1.06, 0.94); }
+  80% { transform: translateY(0) scale(0.96, 1.04); }
 }
 
 /* 最後のページの「とじる」ボタン */
@@ -155,7 +212,7 @@ body {
 .half, .face { display: grid; place-items: center; }
 .leaf-text {
   font-size: 18px;
-  color: #333;
+  color: var(--pop-black);
   text-align: center;
   line-height: 1.4;
   padding: 0 16px;

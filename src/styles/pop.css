@@ -1,0 +1,49 @@
+/* ==========================================================
+   ポップアートの共通ルール（全ページここを見る）
+   色・フォント・線・ドット・ざらつきはここだけで変える
+   ========================================================== */
+:root {
+  /* 色：3色＋黒＋紙 */
+  --pop-red:    #E63B2E;
+  --pop-red-dk: #B8281E;   /* 赤の影（ドット用） */
+  --pop-yellow: #F7C21B;
+  --pop-blue:   #2CA5D9;
+  --pop-black:  #111111;
+  --paper:      #F4EBD9;   /* 少し黄ばんだ紙 */
+
+  /* 線 */
+  --line-w: 4px;
+  --line: var(--line-w) solid var(--pop-black);
+  --shadow: 6px 6px 0 var(--pop-black);   /* ぼかさない影＝コミックっぽさ */
+
+  /* フォント：英字はBangers、日本語はDela Gothic Oneが自動で受け持つ */
+  --font-pop: "Bangers", "Dela Gothic One", sans-serif;
+
+  /* ベンデイドット（色を変えて使えるように関数っぽく） */
+  --dot-size: 10px;
+}
+
+/* ドット模様：背景に重ねる用 */
+.pop-dots {
+  background-image: radial-gradient(var(--dot-color, var(--pop-red-dk)) 28%, transparent 30%);
+  background-size: var(--dot-size) var(--dot-size);
+}
+
+/* ヴィンテージ印刷のざらつき：画面全体にうっすら重ねる */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35  0 0 0 0 0.28  0 0 0 0 0.2  0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* フチ取り文字（コミックのタイトル風） */
+.pop-outline {
+  -webkit-text-stroke: 1.5px var(--pop-black);
+  paint-order: stroke fill;
+  text-shadow: 3px 3px 0 var(--pop-black);
+}

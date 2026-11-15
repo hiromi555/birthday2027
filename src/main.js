@@ -1,5 +1,9 @@
+import '@fontsource/bangers'
+import '@fontsource/dela-gothic-one'
 import './style.css'
 import { gsap } from 'gsap'
+import { SplitText } from 'gsap/SplitText'
+gsap.registerPlugin(SplitText)
 import { pages } from './pages.js'
 import { effects } from './effects/index.js'
 
@@ -12,8 +16,8 @@ const sheet = $('sheet'), frontEl = $('front'), backEl = $('back')
 const rightText = $('rightText'), frontText = $('frontText')
 const fxEl = $('fx')
 
-const COVER = '#e06c8c'     // 表紙の色
-const START_BG = '#f6f1e7'  // 本が見えているときの背景色
+const COVER = '#E63B2E'     // 表紙の色（--pop-red）
+const START_BG = '#F4EBD9'  // 本が見えているときの背景色（--paper）
 
 // 本の置き方（カメラの代わり）
 const TILT = 50
@@ -54,6 +58,45 @@ gsap.to('.flame', {
   yoyo: true,
   ease: 'sine.inOut',
   stagger: { each: 0.07, from: 'random' },
+})
+
+// 表紙のタイトル：1文字ずつポンッと飛び出して、そのあとゆらゆら
+let titleChars = []
+function playCoverIntro() {
+  if (!titleChars.length) return
+  const targets = [titleChars, '.cover-burst']
+  gsap.killTweensOf(targets)
+  gsap.set(targets, { clearProps: 'transform,opacity' })
+
+  gsap.timeline()
+    // ギザギザが回りながら広がる
+    .from('.cover-burst', {
+      scale: 0, rotation: -120, transformOrigin: '50% 50%',
+      duration: 0.6, ease: 'back.out(1.8)',
+    })
+    // 文字がバラバラの角度でボヨンと出てくる
+    .from(titleChars, {
+      scale: 0, y: -24, opacity: 0,
+      rotation: () => gsap.utils.random(-45, 45),
+      duration: 0.55, ease: 'back.out(3)',
+      stagger: 0.06,
+    }, '-=0.3')
+    // そのあとはずっと、文字が波のように上下
+    .add(() => {
+      gsap.to(titleChars, {
+        y: -3, duration: 0.5, ease: 'sine.inOut',
+        stagger: { each: 0.08, repeat: -1, yoyo: true },
+      })
+      gsap.to('.cover-burst', {
+        scale: 1.05, transformOrigin: '50% 50%',
+        duration: 0.8, ease: 'sine.inOut', repeat: -1, yoyo: true,
+      })
+    })
+}
+// フォントが読み込めてから文字を分ける（先に分けると位置がずれる）
+document.fonts.ready.then(() => {
+  titleChars = SplitText.create('#coverTitle', { type: 'chars', charsClass: 'char' }).chars
+  playCoverIntro()
 })
 
 // エフェクトを片付ける
@@ -241,6 +284,7 @@ async function closeBook() {
   book.getAnimations().forEach((a) => a.cancel())  // ← 追加：名残りを全部片付ける
   book.style.transform = coverView()                // ← 追加：表紙の位置に確実に置く
   bookWrap.classList.add('closed')
+  playCoverIntro()  // 表紙に戻ったら、タイトルをもう一度
   current = 0
   state = 'closed'
   busy = false
