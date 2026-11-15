@@ -48,7 +48,7 @@ export function ripple(svg) {
       .to(dot, { scale: 0, duration: 0.4, ease: 'back.in(2)' }, '+=0.8')
   }
 
-  // ② 真ん中から、黒フチのハートの輪が3重に広がる（白と赤を交互に）
+  // ② 真ん中から、黒フチのハートの輪が3重に1回だけ広がる（白と赤を交互に）
   for (let i = 0; i < 3; i++) {
     const g = make(svg, 'g', { transform: `translate(${cx}, ${cy})` })
     const color = i % 2 === 0 ? '#ffffff' : '#E63B2E'
@@ -67,8 +67,8 @@ export function ripple(svg) {
         scale: maxScale,
         duration: 4,
         ease: 'sine.out',
-        repeat: -1,
-        delay: 0.3 + i * 1.33,  // 少しずつずらして3重に
+        delay: 0.3 + i * 0.6,   // 少しずつずらして3重に
+        onComplete: () => g.remove(),  // 広がりきったら片付ける
       }
     )
   }
