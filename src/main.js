@@ -19,9 +19,17 @@ const COVER = '#E63B2E'     // 表紙の色（--pop-red）
 const START_BG = '#F4EBD9'  // 本が見えているときの背景色（--paper）
 
 // 本の置き方（カメラの代わり）
+// ※ 位置はすべて px で計算する（% と px を混ぜた calc() は、
+//    Safari などでアニメーション中にずれることがあるため）
 const TILT = 50
-const REST   = `translate(-50%, -50%) rotateX(${TILT}deg) scale(1)`  // 開いた本
-const CLOSED = `translate(-75%, -50%) rotateX(${TILT}deg) scale(1)`  // 閉じた本
+// 本の真ん中を画面の真ん中に置いたうえで、横に dx（本の幅の何倍か）＋ extra px ずらす
+function place(dx, extra, tilt, s) {
+  const x = -book.offsetWidth * dx - extra
+  const y = -book.offsetHeight * 0.5
+  return `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotateX(${tilt}deg) scale(${s})`
+}
+const rest = () => place(0.5, 0, TILT, 1)     // 開いた本
+const closed = () => place(0.75, 0, TILT, 1)  // 閉じた本
 
 // 真上から見た大きな表紙（画面の大きさに合わせて計算）
 function coverView() {
@@ -29,14 +37,14 @@ function coverView() {
   const coverH = book.offsetHeight
   const s = Math.min((innerWidth * 0.9) / coverW, (innerHeight * 0.85) / coverH)
   const shift = ((s - 1) * coverW) / 2  // 表紙の真ん中を画面の真ん中に
-  return `translate(calc(-75% - ${shift}px), -50%) rotateX(0deg) scale(${s})`
+  return place(0.75, shift, 0, s)
 }
 
 // 右のページの真ん中にズームアップ
 function zoomView() {
   const s = 2.5  // どれだけ寄るか
   const shift = (s * book.offsetWidth) / 4
-  return `translate(calc(-50% - ${shift}px), -50%) rotateX(0deg) scale(${s})`
+  return place(0.5, shift, 0, s)
 }
 
 // 背景の色とドットをまとめて変える（ドットなしなら dot を省略）
@@ -173,18 +181,18 @@ async function zoomOut() {
   book.style.transform = from
   bookWrap.classList.add('visible')
   const out = book.animate(
-    [{ transform: from }, { transform: REST }],
+    [{ transform: from }, { transform: rest() }],
     { duration: 900, easing: 'ease-out', fill: 'forwards' }
   )
   await out.finished
-  book.style.transform = REST
+  book.style.transform = rest()
   out.cancel()
 }
 
 // 本を元の置き方に戻す（見えていない間に）
 function resetBook() {
   book.getAnimations().forEach((a) => a.cancel())
-  book.style.transform = REST
+  book.style.transform = rest()
 }
 
 // 最初の画面：真上から見た大きな表紙
@@ -210,11 +218,11 @@ async function openBook() {
   rightText.textContent = pages[0].text
 
   // ① 表紙から引いて、斜めから見た閉じた本に
-  await moveBook(coverView(), CLOSED, 900)
+  await moveBook(coverView(), closed(), 900)
 
   // ② 表紙を開きながら、本を見開きの位置へ
   book.animate(
-    [{ transform: CLOSED }, { transform: REST }],
+    [{ transform: closed() }, { transform: rest() }],
     { duration: 1200, easing: 'ease-in-out', fill: 'forwards' }
   )
   const flip = flipSheet(true, 1200, first, pages[0].text)
@@ -254,7 +262,7 @@ async function closeBook() {
   prepareSheet(false)
   leftEl.style.visibility = 'hidden'
 
-  const move = moveBook(REST, CLOSED, 1200)
+  const move = moveBook(rest(), closed(), 1200)
   const flip = sheet.animate(
     [
       { transform: 'translateZ(1px) rotateY(-180deg)' },
@@ -268,9 +276,10 @@ async function closeBook() {
   await move
 
   // ③ 表紙に寄っていって、最初の画面に戻る
-  await moveBook(CLOSED, coverView(), 900)
-  book.getAnimations().forEach((a) => a.cancel())  // ← 追加：名残りを全部片付ける
-  book.style.transform = coverView()                // ← 追加：表紙の位置に確実に置く
+  await moveBook(closed(), coverView(), 900)
+  book.getAnimations().forEach((a) => a.cancel())  // 名残りを全部片付ける
+  book.style.transform = coverView()                // 表紙の位置に確実に置く
+  requestAnimationFrame(() => { book.style.transform = coverView() })  // 念のため、次の画面更新でもう一度
   bookWrap.classList.add('closed')
   playCoverIntro()  // 表紙に戻ったら、タイトルをもう一度
   current = 0
