@@ -32,4 +32,17 @@ export const textFx = {
       delay: 0.15,
     })
   },
+
+  // 「バーン！」：0からはじけるように出て、ガタガタッと揺れて、少し傾いて止まる
+  // （エフェクトの bang と同じタイミング）
+  bang(el) {
+    gsap.timeline({ delay: 0.35 })
+      .fromTo(el,
+        { scale: 0, rotation: -20 },
+        { scale: 1, rotation: -4, duration: 0.9, ease: 'elastic.out(1, 0.4)' })
+      .to(el, {
+        keyframes: [{ x: -10, y: 6 }, { x: 8, y: -5 }, { x: -5, y: 3 }, { x: 0, y: 0 }],
+        duration: 0.3, ease: 'none',
+      }, 0.05)
+  },
 }

@@ -86,6 +86,7 @@ let fxCtx = null
 function clearFx() {
   if (fxCtx) fxCtx.kill()  // このページで始めた動きを全部止める
   fxCtx = null
+  gsap.set(fxEl, { clearProps: 'transform' })  // 揺れの途中で止めても、ずれが残らないように
   fxEl.innerHTML = ''
 }
 // 文字・背景・ボタンを表示
