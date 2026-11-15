@@ -13,7 +13,7 @@ const rightText = $('rightText'), frontText = $('frontText')
 const fxEl = $('fx')
 
 const COVER = '#e06c8c'     // 表紙の色
-const START_BG = '#f6f1e7'  // 本が見えているときの背景色
+const START_BG = '#edecec'  // 本が見えているときの背景色
 
 // 本の置き方（カメラの代わり）
 const TILT = 50
@@ -36,7 +36,8 @@ function zoomView() {
   return `translate(calc(-50% - ${shift}px), -50%) rotateX(0deg) scale(${s})`
 }
 
-const light = (c) => `color-mix(in srgb, ${c} 65%, white)`
+// ページ i の本の紙の色：pages.js に paper があればその色、なければ背景色に白を混ぜた色
+const paper = (i) => pages[i].paper || `color-mix(in srgb, ${pages[i].color} 65%, white)`
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const last = pages.length - 1
 
@@ -63,6 +64,7 @@ function clearFx() {
   fxCtx = null
   fxEl.innerHTML = ''
 }
+
 // 文字・背景・ボタンを表示
 function render() {
   const { text, color } = pages[current]
@@ -97,16 +99,16 @@ function prepareSheet(forward) {
   sheet.classList.add('flipping')
 }
 
-// 紙を1枚めくる（めくり終わったら、右のページを endText にする）
-async function flipSheet(forward, duration, endColor, endText) {
+// 紙を1枚めくる（めくり終わったら、左右の紙を endPaper の色・右のページを endText にする）
+async function flipSheet(forward, duration, endPaper, endText) {
   const angles = forward ? [0, -180] : [-180, 0]
   const anim = sheet.animate(
     angles.map((a) => ({ transform: `translateZ(1px) rotateY(${a}deg)` })),
     { duration, easing: 'ease-in-out', fill: 'forwards' }
   )
   await anim.finished
-  leftEl.style.background = light(endColor)
-  rightEl.style.background = light(endColor)
+  leftEl.style.background = endPaper
+  rightEl.style.background = endPaper
   leftEl.style.visibility = 'visible'
   rightText.textContent = endText
   sheet.classList.remove('flipping')
@@ -173,9 +175,9 @@ async function openBook() {
   busy = true
   bookWrap.classList.remove('closed')
   current = 0
-  const first = pages[0].color
-  rightEl.style.background = light(first)
-  backEl.style.background = light(first)
+  const first = paper(0)
+  rightEl.style.background = first
+  backEl.style.background = first
   rightText.textContent = pages[0].text
 
   // ① 表紙から引いて、斜めから見た閉じた本に
@@ -202,14 +204,14 @@ async function openBook() {
 async function closeBook() {
   if (busy || state !== 'open') return
   busy = true
-  const color = pages[current].color
+  const color = paper(current)
 
   controls.classList.remove('visible')
   document.body.style.backgroundColor = START_BG
   pageEl.classList.remove('show')
   clearFx()
-  leftEl.style.background = light(color)
-  rightEl.style.background = light(color)
+  leftEl.style.background = color
+  rightEl.style.background = color
   leftEl.style.visibility = 'visible'
   rightText.textContent = pages[current].text
 
@@ -218,7 +220,7 @@ async function closeBook() {
 
   // ② 表紙を閉じながら、本を表紙の位置へ
   frontEl.style.background = COVER
-  backEl.style.background = light(color)
+  backEl.style.background = color
   sheet.classList.add('is-cover')
   prepareSheet(false)
   leftEl.style.visibility = 'hidden'
@@ -238,8 +240,8 @@ async function closeBook() {
 
   // ③ 表紙に寄っていって、最初の画面に戻る
   await moveBook(CLOSED, coverView(), 900)
-  book.getAnimations().forEach((a) => a.cancel())  // ← 追加：名残りを全部片付ける
-  book.style.transform = coverView()                // ← 追加：表紙の位置に確実に置く
+  book.getAnimations().forEach((a) => a.cancel())  // 名残りを全部片付ける
+  book.style.transform = coverView()                // 表紙の位置に確実に置く
   bookWrap.classList.add('closed')
   current = 0
   state = 'closed'
@@ -250,22 +252,22 @@ async function closeBook() {
 async function go(to) {
   if (busy || state !== 'open' || to < 0 || to > last) return
   busy = true
-  const from = pages[current].color
-  const next = pages[to].color
+  const from = paper(current)  // 今のページの紙の色
+  const next = paper(to)       // 次（または前）のページの紙の色
   const forward = to > current
 
   if (forward) {
-    leftEl.style.background = light(from)
-    rightEl.style.background = light(next)
-    frontEl.style.background = light(from)
-    backEl.style.background = light(next)
+    leftEl.style.background = from
+    rightEl.style.background = next
+    frontEl.style.background = from
+    backEl.style.background = next
     frontText.textContent = pages[current].text  // めくる紙＝今のページ
     rightText.textContent = pages[to].text       // 下から出てくる紙＝次のページ
   } else {
-    leftEl.style.background = light(next)
-    rightEl.style.background = light(from)
-    frontEl.style.background = light(next)
-    backEl.style.background = light(from)
+    leftEl.style.background = next
+    rightEl.style.background = from
+    frontEl.style.background = next
+    backEl.style.background = from
     frontText.textContent = pages[to].text       // 戻ってくる紙＝前のページ
     rightText.textContent = pages[current].text  // 今のページ
   }

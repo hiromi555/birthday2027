@@ -31,20 +31,20 @@ export function hanabi(svg) {
   const { width, height } = svg.getBoundingClientRect()
   const cx = width / 2
   const cy = height / 2
-  const colors = ['#ffc61a', '#2fa8e0', '#e8423f', '#ff8a1e', '#1549c2']
+  const colors = ['#f4e9e8', '#EE5F82', '#F8C145','#030be8',]
 
     // ① 文字のまわりから、クラッカーみたいにパンッと線が飛び出す
   const ix = Math.min(width * 0.38, 200)  // 文字をよける横の広さ
   const iy = 60                           // 文字をよける縦の広さ
-  const count = 34
+  const count = 24
   const base = Math.min(width, height)
 
   const burstG = make(svg, 'g', {})  // 線をまとめるグループ（弾ませる用）
   const rays = []
   for (let i = 0; i < count; i++) {
     const a = ((Math.PI * 2) / count) * i + r(-0.06, 0.06)
-    const sx = cx + Math.cos(a) * (ix + r(0, 20))
-    const sy = cy + Math.sin(a) * (iy + r(0, 20))
+    const sx = cx + Math.cos(a) * (ix + r(0, 15))
+    const sy = cy + Math.sin(a) * (iy + r(0, 15))
     const len = r(base * 0.25, base * 0.6)  // 長めの線
     const ex = sx + Math.cos(a) * len
     const ey = sy + Math.sin(a) * len
@@ -53,17 +53,17 @@ export function hanabi(svg) {
       d: `M${sx},${sy} L${ex},${ey}`,  // まっすぐな線
       fill: 'none',
       stroke: r(colors),
-      'stroke-width': r(4, 7),
+      'stroke-width': r(5, 10),
       'stroke-linecap': 'round',
     }))
   }
 
-    gsap.set(rays, { drawSVG: '0% 0%', opacity: 0 })  // 最初は隠しておく
-  gsap.timeline({ repeat: -1, repeatDelay: 0.8, delay: 0.3 })
+  gsap.set(rays, { drawSVG: '0% 0%', opacity: 0 })  // 最初は隠しておく
+  gsap.timeline({ delay: 0.5 })
     // パンッ！の瞬間に見せる
     .set(rays, { opacity: 1 })
     // 一瞬で全部の線が飛び出す
-    .to(rays, { drawSVG: '0% 100%', duration: 0.35, ease: 'expo.out' })
+    .to(rays, { drawSVG: '0% 100%', duration: 0.5, ease: 'expo.out' })
     // 同時に、全体がポンッと弾む
     .fromTo(burstG,
       { scale: 0.8, svgOrigin: `${cx} ${cy}` },
@@ -76,7 +76,7 @@ export function hanabi(svg) {
       duration: 0.5,
       ease: 'power2.in',
       stagger: { each: 0.005, from: 'random' },
-    }, '+=2')
+    }, '+=1')
     // 消え終わったら、残った点も隠す
     .set(rays, { opacity: 0 })
 
@@ -99,22 +99,22 @@ export function hanabi(svg) {
     make(grad, 'stop', { offset: '100%', 'stop-color': c, 'stop-opacity': 0 })
   })
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 10; i++) {
     const meteor = make(svg, 'g', { opacity: 0 })
      // しっぽ（星の少し後ろから、進む向きと逆に伸びる）
-     const gap = 7  // 星としっぽのすき間
+     const gap = 12  // 星としっぽのすき間
     make(meteor, 'line', {
       x1: -dir.x * gap, y1: -dir.y * gap,
       x2: -dir.x * tailLen, y2: -dir.y * tailLen,
       stroke: `url(#meteor-tail-${i % colors.length})`,
-      'stroke-width': 4,
+      'stroke-width': 3,
       'stroke-linecap': 'round',
     })
     // 頭の黒い星
-    const head = make(meteor, 'path', { d: STAR, fill: '#222222' })
-    gsap.set(head, { scale: r(0.8, 1.5), svgOrigin: '0 0' })
+    const head = make(meteor, 'path', { d: STAR, fill: '#FDF851' })
+    gsap.set(head, { scale: r(0.8, 1.6), svgOrigin: '0 0' })
 
-    gsap.timeline({ repeat: -1, repeatRefresh: true, repeatDelay: r(0.3, 1.5), delay: r(0, 3) })
+    gsap.timeline({ repeat: -1, repeatRefresh: true, repeatDelay: r(0.3, 1.5), delay: r(2, 5) })
       // 右上のどこかから、左下へ流れる
       .fromTo(meteor,
         { x: () => r(width * 0.3, width * 1.1), y: () => r(-height * 0.3, height * 0.4) },

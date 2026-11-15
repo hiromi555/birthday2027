@@ -12,22 +12,43 @@ function make(parent, tag, attrs) {
   return el
 }
 
-// ニコちゃんを1つ作る（filled＝塗りつぶし、false なら線だけ）
-function smiley(parent, color, filled) {
-  const face = make(parent, 'g', {})
+// ニコちゃんの顔を描く（描くたびに中身を作り直す）
+// type：'smile'（にっこり）/ 'wink'（ウインク）/ 'laugh'（わはは）
+function drawSmiley(face, color, filled, type) {
+  face.innerHTML = ''
   const ink = filled ? DARK : color
+
+  // 顔の丸
   make(face, 'circle', {
     cx: 0, cy: 0, r: 20,
     fill: filled ? color : 'none',
     stroke: color, 'stroke-width': 3,
   })
-  make(face, 'ellipse', { cx: -7, cy: -5, rx: 2.2, ry: 4, fill: ink })  // 目
-  make(face, 'ellipse', { cx: 7, cy: -5, rx: 2.2, ry: 4, fill: ink })   // 目
-  make(face, 'path', {                                                  // 口
-    d: 'M-11,3 Q0,16 11,3',
-    fill: 'none', stroke: ink, 'stroke-width': 3, 'stroke-linecap': 'round',
+
+  // 目
+  const openEye = (x) => make(face, 'ellipse', { cx: x, cy: -5, rx: 2.2, ry: 4, fill: ink })
+  const closedEye = (x) => make(face, 'path', {
+    d: `M${x - 3.5},-4 Q${x},-9 ${x + 3.5},-4`,  // 「＾」の形
+    fill: 'none', stroke: ink, 'stroke-width': 2.5, 'stroke-linecap': 'round',
   })
-  return face
+
+  if (type === 'smile') { openEye(-7); openEye(7) }
+  if (type === 'wink') { openEye(-7); closedEye(7) }
+  if (type === 'laugh') { closedEye(-7); closedEye(7) }
+
+  // 口
+  if (type === 'laugh') {
+    // 大きく開けた口
+    make(face, 'path', {
+      d: 'M-11,3 Q0,18 11,3 Z',
+      fill: ink, stroke: ink, 'stroke-width': 2, 'stroke-linejoin': 'round',
+    })
+  } else {
+    make(face, 'path', {
+      d: 'M-11,3 Q0,16 11,3',
+      fill: 'none', stroke: ink, 'stroke-width': 3, 'stroke-linecap': 'round',
+    })
+  }
 }
 
 // ✱ のお花（6本の線）
@@ -50,24 +71,53 @@ function placeAround(el, width, height) {
 export function smile(svg, accent = '#c8f03c') {
   const { width, height } = svg.getBoundingClientRect()
   const colors = [accent, '#ff2d4f', '#ffffff', '#ffd400']
+  const types = ['smile', 'wink', 'laugh']
 
-  // ① ニコちゃんが、あちこちでポンッと現れて、首をかしげて、消える
-  for (let i = 0; i < 5; i++) {
+  // ニコちゃんの「席」：文字をよけて、上と下に並べる（スマホは2列、PCは3列）
+  const cols = width < 600 ? [0.27, 0.73] : [0.2, 0.5, 0.8]
+  const rows = [0.2, 0.8]
+  const seats = []
+  rows.forEach((ry) => cols.forEach((cxr) => seats.push({ x: width * cxr, y: height * ry })))
+
+  const taken = new Set()  // 今だれかが座っている席
+  // 空いている席から1つ選ぶ（さっきと同じ席は避ける）
+  function takeSeat(prev) {
+    if (prev !== null) taken.delete(prev)
+    let free = seats.map((_, i) => i).filter((i) => !taken.has(i) && i !== prev)
+    if (free.length === 0) free = [prev]
+    const seat = r(free)
+    taken.add(seat)
+    return seat
+  }
+
+  // ① ニコちゃんが、空いている席にポンッと現れて、首をかしげて、消える
+  for (let i = 0; i < 3; i++) {
     const pos = make(svg, 'g', {})
-    const face = smiley(pos, r(colors), Math.random() < 0.5)
-    const place = () => placeAround(pos, width, height)
-    place()
-    const size = r(1.5, 3.5)
-    const tilt = r(-35, 35)  // ちょっと傾けて、ポップな感じに
+    const face = make(pos, 'g', {})
+    let seat = null
 
-    gsap.timeline({ repeat: -1, repeatDelay: r(0.2, 1), delay: r(0, 2.5), onRepeat: place })
+    // 新しい席と、新しい顔に入れかえる
+    const refresh = () => {
+      seat = takeSeat(seat)
+      const s = seats[seat]
+      const jx = r(-width * 0.04, width * 0.04)  // 席の中で少しだけずらす
+      const jy = r(-height * 0.04, height * 0.04)
+      pos.setAttribute('transform', `translate(${s.x + jx}, ${s.y + jy})`)
+      drawSmiley(face, r(colors), Math.random() < 0.5, r(types))
+    }
+    refresh()
+
+    const size = r(2, 3)
+    const tilt = r(-5, 5)
+
+    gsap.timeline({ repeat: -1, repeatDelay: r(0.2, 1), delay: r(0, 2.5), onRepeat: refresh })
       // くるっと回りながら、ポンッと現れる
       .fromTo(face,
         { scale: 0, rotation: tilt - 180, svgOrigin: '0 0' },
         { scale: size, rotation: tilt, duration: 0.6, ease: 'back.out(2.5)' }
       )
       // 首をかしげるように揺れる
-      .to(face, { rotation: tilt + 15, duration: 0.35, ease: 'sine.inOut', repeat: 3, yoyo: true })
+      .to(face, { rotation: tilt + 10, duration: 0.35, ease: 'sine.inOut', repeat: 3, yoyo: true })
       // ポンッと消える
       .to(face, { scale: 0, duration: 0.35, ease: 'back.in(2.5)' })
   }
@@ -97,7 +147,7 @@ export function smile(svg, accent = '#c8f03c') {
       'dominant-baseline': 'middle',
       'font-family': 'Georgia, serif',
       'font-weight': 'bold',
-      'font-size': 26,
+      'font-size': 30,
       fill: colors[i % colors.length],
     })
     word.textContent = 'Smile'

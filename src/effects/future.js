@@ -24,7 +24,7 @@ function triPath(size) {
 }
 
 // 近未来：ネオンの三角形＋浮かぶ三角形＋スキャンライン（軽量版）
-export function future(svg, accent = '#4ff0ff') {
+export function future(svg, accent = '#3FA0C9') {
   const { width, height } = svg.getBoundingClientRect()
   const cx = width / 2
   const cy = height / 2
@@ -32,10 +32,11 @@ export function future(svg, accent = '#4ff0ff') {
 
   // ① 大きな三角形が3重に描かれて、ゆっくり回りながら明滅する
   const sizes = [base * 0.55, base * 0.45, base * 0.36]
+  const spins = []  // ← 追加：回っているグループを覚えておく
   sizes.forEach((size, i) => {
     const pos = make(svg, 'g', { transform: `translate(${cx}, ${cy})` })
     const spin = make(pos, 'g', {})  // 回すのはこのグループごと
-
+    spins.push(spin)
     const d = triPath(size)
     const lineW = i === 0 ? 2 : 1.2
     // 後ろの「光のにじみ」：太くて薄い線
@@ -83,5 +84,75 @@ export function future(svg, accent = '#4ff0ff') {
    .fromTo(scan, { y: height + 10 }, { y: -10, duration: 2.2, ease: 'power1.inOut' })  // 下 → 上
       .to(scan, { opacity: 0.8, duration: 0.3 }, 0)
       .to(scan, { opacity: 0, duration: 0.4 }, '-=0.4')
+  }
+    // ④ ビリビリ電気：三角形の角と角のあいだに、稲妻がパチパチ走る
+
+  // 三角形 i の、角 k の「今の」位置（回っている角度も計算に入れる）
+  function corner(i, k) {
+    const rot = gsap.getProperty(spins[i], 'rotation')
+    const a = ((-90 + k * 120 + rot) * Math.PI) / 180
+    return { x: cx + Math.cos(a) * sizes[i], y: cy + Math.sin(a) * sizes[i] }
+  }
+
+  // 2つの点のあいだに、ギザギザの稲妻の形を作る
+  function boltPath(p1, p2, segs = 30, jitter = 20) {
+    const dx = p2.x - p1.x
+    const dy = p2.y - p1.y
+    const len = Math.hypot(dx, dy) || 1
+    const nx = -dy / len  // 線に対して直角の向き（ギザギザを出す方向）
+    const ny = dx / len
+    let d = `M${p1.x},${p1.y}`
+    for (let s = 1; s < segs; s++) {
+      const t = s / segs
+      const off = r(-jitter, jitter)
+      d += ` L${p1.x + dx * t + nx * off},${p1.y + dy * t + ny * off}`
+    }
+    return d + ` L${p2.x},${p2.y}`
+  }
+
+  for (let b = 0; b < 2; b++) {  // 稲妻は2本
+    const boltG = make(svg, 'g', { opacity: 0 })
+    const glow = make(boltG, 'path', {  // にじみ
+      fill: 'none', stroke: accent, 'stroke-width': 6, opacity: 0.4,
+      'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+    })
+    const core = make(boltG, 'path', {  // 白い芯
+      fill: 'none', stroke: '#ffffff', 'stroke-width': 1.6,
+      'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+    })
+
+    let p1, p2
+    // 電気が走る場所を決める
+    const pick = () => {
+      const i = r(0, 2, 1)
+      const k = r(0, 2, 1)
+      if (Math.random() < 0.5) {
+        // 三角形の辺に沿って走る
+        p1 = corner(i, k)
+        p2 = corner(i, (k + 1) % 3)
+      } else {
+        // 別の三角形の角へ飛ぶ
+        const j = (i + r(1, 2, 1)) % 3
+        p1 = corner(i, k)
+        p2 = corner(j, r(0, 2, 1))
+      }
+    }
+    // ギザギザの形を描き直す
+    const redraw = () => {
+      const d = boltPath(p1, p2)
+      glow.setAttribute('d', d)
+      core.setAttribute('d', d)
+    }
+
+    const zap = gsap.timeline({ repeat: -1, repeatDelay: r(0.8, 2.2), delay: 2 + b * 0.7 })
+      .call(pick)
+      .call(redraw)
+      .set(boltG, { opacity: 1 })  // バチッ！
+    // パチパチ：形を変えながら、明るさをチカチカさせる
+    for (let f = 0; f < 6; f++) {
+      zap.call(redraw, null, '+=0.01')
+         .set(boltG, { opacity: f % 2 === 0 ? 0.4 : 1 })
+    }
+    zap.to(boltG, { opacity: 0, duration: 0.15 })  // スッと消える
   }
 }

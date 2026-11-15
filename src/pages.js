@@ -1,8 +1,8 @@
 export const pages = [
-  { text: 'Happy Birthday',   color: '#fde4ec', accent: '#e06c8c', effect: 'confetti' },
-  { text: 'お誕生日',         color: '#fff3d1', accent: '#f2a900', effect: 'ripple' },
-  { text: 'おめでとう', color: '#fffdf6', effect: 'hanabi' },
-  { text: '新しい1年が', color: '#0d0b1e', accent: '#4ff0ff', ink: '#e8fbff', effect: 'future' },
-  { text: 'たくさんの笑顔で', color: '#111111', accent: '#c8f03c', ink: '#ffffff', effect: 'smile' },
-    { text: 'あふれますように', color: '#1b2a5c', ink: '#ffffff', effect: 'fireworks' },
+  { text: 'Happy Birthday',   color: '#a86df0', accent: '#d975f7', effect: 'confetti' },
+  { text: 'お誕生日',         color: '#f87c4b', accent: '#faf6ed', effect: 'ripple' },
+  { text: 'おめでとう', color: '#66C3C1', effect: 'meteorShower' },
+  { text: '新たな一年も', color: '#111', accent: '#E44BC6', ink: '#e8fbff', paper: '#f7d0f9', effect: 'future' },
+  { text: '笑顔でいっぱいに', color: '#111', accent: '#b6f172', ink: '#ffffff', paper: '#b3e2fa', effect: 'smile' },
+  { text: 'Have a great year', color: '#111', ink: '#ffffff', paper: '#daf5ba', effect: 'fireworks' },
 ]

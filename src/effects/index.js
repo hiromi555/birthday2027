@@ -8,6 +8,7 @@ import { smile } from './smile.js'
 import { finale } from './finale.js'
 import { hanabi } from './hanabi.js'
 import { fireworks } from './fireworks.js'
+import { meteorShower } from './meteorShower.js'
 
 export const effects = {
   confetti,
@@ -20,4 +21,5 @@ export const effects = {
   finale,
   hanabi,
   fireworks,
+  meteorShower,
 }

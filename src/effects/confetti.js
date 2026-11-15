@@ -33,7 +33,7 @@ export function confetti(svg, accent = '#fff') {
       .to(el, {
         x: cx + Math.cos(angle) * dist,
         y: cy + Math.sin(angle) * dist,
-        scale: r(1, 2),
+        scale: r(1.2, 2.5),
         rotation: r(-360, 360),
         duration: r(0.6, 1),
         ease: 'power3.out',
