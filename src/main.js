@@ -112,6 +112,7 @@ function render() {
 
   setBg(color, pages[current].dot)
   document.body.style.setProperty('--ink', pages[current].ink || '#333')
+  document.body.style.setProperty('--text-color', pages[current].textColor || '#fff')
   counterEl.textContent = `${current + 1} / ${pages.length}`
   prevBtn.disabled = current === 0
 

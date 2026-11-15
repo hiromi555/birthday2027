@@ -59,4 +59,19 @@ export const textFx = {
       delay: 0.2,
     })
   },
+
+  // 下からポンポン出てきたあと、1文字ずつピョンと跳ねて止まる（うれしいジャンプ）
+  hop(el) {
+    const { chars } = SplitText.create(el, { type: 'chars', charsClass: 'char' })
+    gsap.timeline({ delay: 0.15 })
+      .from(chars, { y: 60, opacity: 0, duration: 0.4, ease: 'back.out(2)', stagger: 0.07 })
+      .to(chars, {
+        keyframes: [
+          { y: -22, scaleY: 1.1, duration: 0.18, ease: 'power2.out' },
+          { y: 0, scaleY: 0.9, duration: 0.18, ease: 'power2.in' },
+          { scaleY: 1, duration: 0.12 },
+        ],
+        stagger: 0.08,
+      }, '+=0.1')
+  },
 }

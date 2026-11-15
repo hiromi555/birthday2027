@@ -10,6 +10,7 @@ import { hanabi } from './hanabi.js'
 import { fireworks } from './fireworks.js'
 import { bang } from './bang.js'
 import { spaceAge } from './space-age.js'
+import { smileys } from './smileys.js'
 
 export const effects = {
   confetti,
@@ -24,4 +25,5 @@ export const effects = {
   fireworks,
   bang,
   spaceAge,
+  smileys,
 }
