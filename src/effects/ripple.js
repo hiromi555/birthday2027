@@ -24,28 +24,28 @@ export function ripple(svg) {
   const cy = height / 2
   const maxScale = (Math.max(width, height) * 0.6) / 20  // 画面の外まで広がる
 
-  // ① まわりで、黒フチの水玉がポンッと出てはしぼむ（波紋より奥に置く）
-  const place = (dot) => {
-    dot.setAttribute('cx', r(width * 0.05, width * 0.95))
-    dot.setAttribute('cy', r(height * 0.08, height * 0.92))
+  // ① まわりで、小さな輪っかがその場でふわっと広がって消える（ハートの余韻）
+  const place = (g) => {
+    g.setAttribute('transform', `translate(${r(width * 0.06, width * 0.94)}, ${r(height * 0.08, height * 0.92)})`)
   }
-  for (let i = 0; i < 22; i++) {
-    const dot = make(svg, 'circle', {
-      r: r(10, 34),
-      fill: r(['#E63B2E', '#E63B2E', '#F7C21B', '#ffffff']),
-      stroke: INK,
-      'stroke-width': 3,
+  for (let i = 0; i < 18; i++) {
+    const g = make(svg, 'g', {})
+    place(g)
+    // 下に黒い線、上に色の線を重ねて「フチ取りの輪」にする
+    const outline = make(g, 'circle', { r: 0, fill: 'none', stroke: INK, 'stroke-width': 6 })
+    const ring = make(g, 'circle', {
+      r: 0, fill: 'none', stroke: r(['#ffffff', '#ffffff', '#E63B2E', '#F7C21B']), 'stroke-width': 3,
     })
-    place(dot)
-    gsap.set(dot, { scale: 0, transformOrigin: 'center' })
+    const size = r(18, 45)
     gsap.timeline({
       repeat: -1,
-      repeatDelay: r(0.3, 1.5),
-      delay: r(0.3, 2.5),
-      onRepeat: () => place(dot),  // 毎回ちがう場所に出てくる
-    })
-      .to(dot, { scale: 1, duration: 0.35, ease: 'back.out(3)' })
-      .to(dot, { scale: 0, duration: 0.4, ease: 'back.in(2)' }, '+=0.8')
+      repeatDelay: r(0.5, 2),
+      delay: r(1.5, 4),           // ハートが広がっている間は少し控えめに
+      onRepeat: () => place(g),   // 毎回ちがう場所に出てくる
+    }).fromTo([outline, ring],
+      { attr: { r: 0 }, opacity: 1 },
+      { attr: { r: size }, opacity: 0, duration: 1.6, ease: 'power2.out' }
+    )
   }
 
   // ② 真ん中から、黒フチのハートの輪が3重に1回だけ広がる（白と赤を交互に）
@@ -65,8 +65,8 @@ export function ripple(svg) {
       { scale: 1, svgOrigin: '0 0', opacity: 1 },
       {
         scale: maxScale,
-        duration: 4,
-        ease: 'sine.out',
+        duration: 3,
+        ease: 'power3.in',   // 最初ゆっくり→だんだん速く
         delay: 0.3 + i * 0.6,   // 少しずつずらして3重に
         onComplete: () => g.remove(),  // 広がりきったら片付ける
       }
