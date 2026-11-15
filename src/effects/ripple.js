@@ -17,35 +17,62 @@ function make(parent, tag, attrs) {
   return el
 }
 
-// ハートの波紋＋ぽこぽこ水玉（ポップアート版）
+// ハートの波紋＋流れ星（ポップアート版）
 export function ripple(svg) {
   const { width, height } = svg.getBoundingClientRect()
   const cx = width / 2
   const cy = height / 2
   const maxScale = (Math.max(width, height) * 0.6) / 20  // 画面の外まで広がる
 
-  // ① まわりで、小さな輪っかがその場でふわっと広がって消える（ハートの余韻）
-  const place = (g) => {
-    g.setAttribute('transform', `translate(${r(width * 0.06, width * 0.94)}, ${r(height * 0.08, height * 0.92)})`)
-  }
-  for (let i = 0; i < 18; i++) {
+  // ① 流れ星：黄色い星（黒フチ）に白い尾をつけて、右上から左下へ流れる
+  const angle = 150                                  // 流れる向き（左下へ）
+  const rad = (angle * Math.PI) / 180
+  const dist = Math.max(width, height) * 0.8         // 流れる距離
+  const STAR5 = 'M0,-12 L3.5,-4 L12,-3.5 L5.5,2.5 L7.5,11 L0,6.5 L-7.5,11 L-5.5,2.5 L-12,-3.5 L-3.5,-4Z'
+
+  for (let i = 0; i < 4; i++) {
+    const size = r(1.7, 2.3)           // 星の大きさ
     const g = make(svg, 'g', {})
-    place(g)
-    // 下に黒い線、上に色の線を重ねて「フチ取りの輪」にする
-    const outline = make(g, 'circle', { r: 0, fill: 'none', stroke: INK, 'stroke-width': 6 })
-    const ring = make(g, 'circle', {
-      r: 0, fill: 'none', stroke: r(['#ffffff', '#ffffff', '#E63B2E', '#F7C21B']), 'stroke-width': 3,
+    // 尾は星のうしろ（流れる向きと反対）にのびる
+    const tail = make(g, 'g', { transform: `rotate(${angle + 180})` })
+    const len = r(160, 260)
+    make(tail, 'path', {
+      d: `M0,-11 L${len},0 L0,11 Z`,
+      fill: '#ffffff', stroke: INK, 'stroke-width': 3.5, 'stroke-linejoin': 'round',
     })
-    const size = r(18, 45)
-    gsap.timeline({
+    const starG = make(g, 'g', { transform: `scale(${size})` })
+    const star = make(starG, 'path', {
+      d: STAR5, fill: '#F7C21B', stroke: INK, 'stroke-width': 1.8, 'stroke-linejoin': 'round',
+    })
+
+    // 出てくる場所：画面の上のほう〜右のほう（毎回ちがう場所）
+    let sx = 0, sy = 0
+    const pick = () => {
+      sx = r(width * 0.3, width * 1.1)
+      sy = r(-height * 0.05, height * 0.45)
+    }
+    pick()
+    gsap.set(g, { opacity: 0 })
+
+    const time = r(1, 1.4)
+    const tl = gsap.timeline({
       repeat: -1,
-      repeatDelay: r(0.5, 2),
-      delay: r(1.5, 4),           // ハートが広がっている間は少し控えめに
-      onRepeat: () => place(g),   // 毎回ちがう場所に出てくる
-    }).fromTo([outline, ring],
-      { attr: { r: 0 }, opacity: 1 },
-      { attr: { r: size }, opacity: 0, duration: 1.6, ease: 'power2.out' }
-    )
+      repeatDelay: r(1, 3),
+      delay: 1.2 + i * 0.9,              // ハートが広がっているあいだに1つずつ
+      onRepeat: () => { pick(); tl.invalidate() },  // 次は別の場所から
+    })
+    tl.fromTo(g,
+        { x: () => sx, y: () => sy, opacity: 1 },
+        {
+          x: () => sx + Math.cos(rad) * dist,
+          y: () => sy + Math.sin(rad) * dist,
+          duration: time,
+          ease: 'power1.in',
+          immediateRender: false,   // 出番が来るまでは見せない
+        })
+      .fromTo(tail, { scaleX: 0, svgOrigin: '0 0' }, { scaleX: 1, duration: 0.3, ease: 'power2.out' }, 0)  // 尾がシュッとのびる
+      .fromTo(star, { rotation: 0, svgOrigin: '0 0' }, { rotation: 360, duration: time, ease: 'none' }, 0)
+      .to(g, { opacity: 0, duration: 0.3 }, time - 0.3)  // 最後はスッと消える
   }
 
   // ② 真ん中から、黒フチのハートの輪が3重に1回だけ広がる（白と赤を交互に）
