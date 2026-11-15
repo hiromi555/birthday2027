@@ -28,7 +28,7 @@ export function popFireworks(svg) {
   const base = Math.min(width, height)
 
   for (let i = 0; i < 5; i++) {
-    const size = base * r(0.08, 0.12)          // 花火の大きさ
+    const size = base * r(0.06, 0.10)          // 花火の大きさ
     const color = COLORS[i % COLORS.length]
     const color2 = r(COLORS.filter((c) => c !== color))
 
