@@ -13,14 +13,34 @@ function make(parent, tag, attrs) {
 }
 
 // スマイルマークを1つ描く（真ん中が 0,0、半径30）
-function smiley(parent, color) {
+// type：'smile'（にっこり）/ 'wink'（ウインク）/ 'laugh'（わはは）
+// ※ 顔のバリエーションは book-version の smile.js から引っ越し
+function smiley(parent, color, type) {
   const g = make(parent, 'g', {})
   make(g, 'circle', { r: 30, fill: color, stroke: INK, 'stroke-width': 4 })
-  make(g, 'ellipse', { cx: -10, cy: -8, rx: 3.5, ry: 7, fill: INK })
-  make(g, 'ellipse', { cx: 10, cy: -8, rx: 3.5, ry: 7, fill: INK })
-  make(g, 'path', {
-    d: 'M-17,6 Q0,26 17,6', fill: 'none', stroke: INK, 'stroke-width': 4, 'stroke-linecap': 'round',
+
+  // 目
+  const openEye = (x) => make(g, 'ellipse', { cx: x, cy: -8, rx: 3.5, ry: 7, fill: INK })
+  const closedEye = (x) => make(g, 'path', {   // 「＾」の形（への字の目）
+    d: `M${x - 6},-5 Q${x},-15 ${x + 6},-5`,
+    fill: 'none', stroke: INK, 'stroke-width': 4, 'stroke-linecap': 'round',
   })
+  if (type === 'smile') { openEye(-10); openEye(10) }
+  if (type === 'wink') { openEye(-10); closedEye(10) }
+  if (type === 'laugh') { closedEye(-10); closedEye(10) }
+
+  // 口
+  if (type === 'laugh') {
+    // 大きく開けた口（中に赤い舌）
+    make(g, 'path', {
+      d: 'M-17,4 Q0,30 17,4 Z', fill: INK, stroke: INK, 'stroke-width': 3, 'stroke-linejoin': 'round',
+    })
+    make(g, 'path', { d: 'M-8,15 Q0,10 8,15 Q0,21 -8,15Z', fill: '#E63B2E' })
+  } else {
+    make(g, 'path', {
+      d: 'M-17,6 Q0,26 17,6', fill: 'none', stroke: INK, 'stroke-width': 4, 'stroke-linecap': 'round',
+    })
+  }
   return g
 }
 
@@ -44,7 +64,9 @@ export function smileys(svg) {
 
   spots.forEach((p, i) => {
     const pos = make(svg, 'g', { transform: `translate(${p.x.toFixed(1)}, ${p.y.toFixed(1)})` })
-    const face = smiley(pos, r(['#F7C21B', '#F7C21B', '#F7C21B', '#E63B2E', '#ffffff']))
+    const face = smiley(pos,
+      r(['#F7C21B', '#F7C21B', '#F7C21B', '#E63B2E', '#ffffff']),
+      r(['smile', 'wink', 'laugh']))
     const tilt = r(-20, 20)
 
     // ポンッと出てくる（だんだん速く、次々に）
