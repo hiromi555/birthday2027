@@ -2,8 +2,6 @@ import '@fontsource/bangers'
 import '@fontsource/dela-gothic-one'
 import './style.css'
 import { gsap } from 'gsap'
-import { SplitText } from 'gsap/SplitText'
-gsap.registerPlugin(SplitText)
 import { pages } from './pages.js'
 import { effects } from './effects/index.js'
 
@@ -60,44 +58,23 @@ gsap.to('.flame', {
   stagger: { each: 0.07, from: 'random' },
 })
 
-// 表紙のタイトル：1文字ずつポンッと飛び出して、そのあとゆらゆら
-let titleChars = []
+// 表紙のタイトル：最初に画面いっぱいの大きさで出て、元の位置にドンと収まって止まる
+const coverTitle = $('coverTitle')
 function playCoverIntro() {
-  if (!titleChars.length) return
-  const targets = [titleChars, '.cover-burst']
-  gsap.killTweensOf(targets)
-  gsap.set(targets, { clearProps: 'transform,opacity' })
+  gsap.killTweensOf(coverTitle)
+  gsap.set(coverTitle, { scale: 1, rotation: -6, opacity: 1 })
+
+  // 画面の横幅いっぱいになる倍率を計算（本の拡大ぶんも含めて測る）
+  const w = coverTitle.getBoundingClientRect().width
+  const big = (innerWidth * 0.95) / w
 
   gsap.timeline()
-    // ギザギザが回りながら広がる
-    .from('.cover-burst', {
-      scale: 0, rotation: -120, transformOrigin: '50% 50%',
-      duration: 0.6, ease: 'back.out(1.8)',
-    })
-    // 文字がバラバラの角度でボヨンと出てくる
-    .from(titleChars, {
-      scale: 0, y: -24, opacity: 0,
-      rotation: () => gsap.utils.random(-45, 45),
-      duration: 0.55, ease: 'back.out(3)',
-      stagger: 0.06,
-    }, '-=0.3')
-    // そのあとはずっと、文字が波のように上下
-    .add(() => {
-      gsap.to(titleChars, {
-        y: -3, duration: 0.5, ease: 'sine.inOut',
-        stagger: { each: 0.08, repeat: -1, yoyo: true },
-      })
-      gsap.to('.cover-burst', {
-        scale: 1.05, transformOrigin: '50% 50%',
-        duration: 0.8, ease: 'sine.inOut', repeat: -1, yoyo: true,
-      })
-    })
+    .from(coverTitle, { scale: big, opacity: 0, duration: 0.25, ease: 'power1.out' })
+    .to(coverTitle, { scale: big, duration: 0.5 })          // 大きいまま少し見せる
+    .to(coverTitle, { scale: 1, duration: 0.6, ease: 'back.out(1.6)' }) // ドンと収まる
 }
-// フォントが読み込めてから文字を分ける（先に分けると位置がずれる）
-document.fonts.ready.then(() => {
-  titleChars = SplitText.create('#coverTitle', { type: 'chars', charsClass: 'char' }).chars
-  playCoverIntro()
-})
+// フォントが読み込めてから測る（先に測ると大きさがずれる）
+document.fonts.ready.then(playCoverIntro)
 
 // エフェクトを片付ける
 let fxCtx = null

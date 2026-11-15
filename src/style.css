@@ -153,7 +153,6 @@ body {
   color: #fff;
   transform: rotate(-6deg);
 }
-.cover-title .char { display: inline-block; }   /* 1文字ずつ動かす用 */
 .cover-cake { width: 92%; height: auto; overflow: visible; }
 
 /* 「タップしてひらいてね」（閉じているときだけ点滅） */
