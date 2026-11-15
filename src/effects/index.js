@@ -9,6 +9,7 @@ import { finale } from './finale.js'
 import { hanabi } from './hanabi.js'
 import { fireworks } from './fireworks.js'
 import { bang } from './bang.js'
+import { spaceAge } from './space-age.js'
 
 export const effects = {
   confetti,
@@ -22,4 +23,5 @@ export const effects = {
   hanabi,
   fireworks,
   bang,
+  spaceAge,
 }

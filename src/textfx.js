@@ -45,4 +45,18 @@ export const textFx = {
         duration: 0.3, ease: 'none',
       }, 0.05)
   },
+
+  // 1文字ずつ、右からシュッと斜めに飛び込んできて止まる（ロケットのスピード感）
+  zoom(el) {
+    const { chars } = SplitText.create(el, { type: 'chars', charsClass: 'char' })
+    gsap.from(chars, {
+      x: () => innerWidth * 0.7,
+      skewX: -35,
+      opacity: 0,
+      duration: 0.8,
+      ease: 'expo.out',
+      stagger: 0.09,
+      delay: 0.2,
+    })
+  },
 }

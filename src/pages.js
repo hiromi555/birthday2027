@@ -5,7 +5,7 @@ export const pages = [
   { text: 'Happy Birthday',     color: '#F7C21B', dot: '#E9A800', effect: 'confetti', textFx: 'pop' },
   { text: 'お誕生日',           color: '#2CA5D9', dot: '#1F8FC0', effect: 'shootingStars', textFx: 'drop' },
   { text: 'おめでとう',         color: '#E63B2E', dot: '#C42E22', effect: 'bang',     textFx: 'bang' },
-  { text: '新しい1年も',        color: '#0d0b1e', accent: '#4ff0ff', ink: '#e8fbff', effect: 'future' },
+  { text: '新しい１年も',       color: '#1B2A5C', dot: '#26397A', effect: 'spaceAge', textFx: 'zoom' },
   { text: '笑顔いっぱいで',     color: '#111111', accent: '#c8f03c', ink: '#ffffff', effect: 'smile' },
   { text: 'Have a great year!', color: '#1b2a5c', ink: '#ffffff', effect: 'fireworks' },
 ]
