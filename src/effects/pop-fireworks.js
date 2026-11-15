@@ -79,9 +79,10 @@ export function popFireworks(svg) {
       .set(ball, { opacity: 0 })
       // ② パーン！と広がる
       .set(fw, { x: () => x, y: () => y, opacity: 1 })
-      .fromTo(rays, { scale: 0.1, rotation: 0, svgOrigin: '0 0' },
+      // （中心を基準に広げる。svgOrigin だとくり返すたびに位置がずれるので transformOrigin）
+      .fromTo(rays, { scale: 0.1, rotation: 0, transformOrigin: '50% 50%' },
         { scale: 1, rotation: 12, duration: 0.6, ease: 'power3.out', immediateRender: false })
-      .fromTo(core, { scale: 0, svgOrigin: '0 0' },
+      .fromTo(core, { scale: 0, transformOrigin: '50% 50%' },
         { scale: 1, duration: 0.3, ease: 'back.out(3)', immediateRender: false }, '<')
       // ③ 中心がしぼんで、全体がスッと消える
       .to(core, { scale: 0, duration: 0.3, ease: 'power2.in' }, '+=0.15')

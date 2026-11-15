@@ -62,7 +62,7 @@ export function shootingStars(svg) {
           ease: 'power1.in',
           immediateRender: false,   // 出番が来るまでは見せない
         })
-      .fromTo(tail, { scaleX: 0, svgOrigin: '0 0' }, { scaleX: 1, duration: 0.3, ease: 'power2.out' }, 0)  // 尾がシュッとのびる
+      .fromTo(tail, { scaleX: 0, transformOrigin: '0px 50%' }, { scaleX: 1, duration: 0.3, ease: 'power2.out' }, 0)  // 尾がシュッとのびる
       .to(g, { opacity: 0, duration: 0.2 }, time - 0.2)  // 最後の最後にスッと消える
   }
 }
