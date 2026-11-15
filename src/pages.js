@@ -3,7 +3,7 @@
 // effect: エフェクトの名前 / textFx: 文字の動きの名前（src/textfx.js）
 export const pages = [
   { text: 'Happy Birthday',     color: '#F7C21B', dot: '#E9A800', effect: 'confetti', textFx: 'pop' },
-  { text: 'お誕生日',           color: '#fff3d1', accent: '#f2a900', effect: 'ripple' },
+  { text: 'お誕生日',           color: '#2CA5D9', dot: '#1F8FC0', effect: 'ripple',   textFx: 'drop' },
   { text: 'おめでとう',         color: '#fffdf6', effect: 'hanabi' },
   { text: '新しい1年も',        color: '#0d0b1e', accent: '#4ff0ff', ink: '#e8fbff', effect: 'future' },
   { text: '笑顔いっぱいで',     color: '#111111', accent: '#c8f03c', ink: '#ffffff', effect: 'smile' },

@@ -19,4 +19,17 @@ export const textFx = {
       delay: 0.15,
     })
   },
+
+  // 1文字ずつ上から落ちてきて、ボヨンボヨンと弾んで止まる
+  drop(el) {
+    const { chars } = SplitText.create(el, { type: 'chars', charsClass: 'char' })
+    gsap.from(chars, {
+      y: () => -innerHeight * 0.6,
+      opacity: 0,
+      duration: 1,
+      ease: 'bounce.out',
+      stagger: 0.15,
+      delay: 0.15,
+    })
+  },
 }

@@ -94,6 +94,8 @@ body {
 
 /* 矢印とページ番号（本が開くまで隠す） */
 .controls {
+  position: relative;
+  z-index: 2;   /* エフェクトより手前に */
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -101,15 +103,35 @@ body {
   transition: opacity 0.6s ease;
 }
 .controls.visible { opacity: 1; }
+/* ボタンとページ番号：どの背景でも見えるように、白地＋黒フチのコミック風 */
 .nav {
-  border: none;
-  background: none;
-  font-size: 2.5rem;
-  color: var(--ink, #333);
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 3px solid var(--pop-black);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 3px 3px 0 var(--pop-black);
+  font-family: Arial, sans-serif;   /* 矢印の記号は普通のフォントのほうがきれい */
+  font-weight: 900;
+  font-size: 1.8rem;
+  line-height: 1;
+  padding-bottom: 4px;
+  color: var(--pop-black);
   cursor: pointer;
 }
-.nav:disabled { opacity: 0.2; cursor: default; }
-.counter { font-size: 0.9rem; color: var(--ink, #333); }
+.nav:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--pop-black); }
+.nav:disabled { opacity: 0.35; cursor: default; }
+.counter {
+  font-size: 1rem;
+  letter-spacing: 1px;
+  color: var(--pop-black);
+  background: #fff;
+  border: 3px solid var(--pop-black);
+  border-radius: 999px;
+  padding: 2px 12px;
+}
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
@@ -201,7 +223,7 @@ body {
 }
 
 /* 最後のページの「とじる」ボタン */
-.nav.close { font-size: 1.3rem; }
+.nav.close { width: auto; border-radius: 999px; padding: 0 16px; font-family: "Dela Gothic One", sans-serif; font-weight: 400; font-size: 1rem; }
 
 
 /* エフェクト用のSVG（画面全体・クリックは素通り） */
