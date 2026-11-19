@@ -234,7 +234,7 @@ body {
   height: 100%;
   pointer-events: none;
 }
-.page { position: relative; z-index: 1; }  /* 文字はエフェクトより手前 */
+.page { position: relative; z-index: 1; pointer-events: none; }  /* 文字はエフェクトより手前。タップは下の本に素通りさせる */
 
 /* 本のページに印刷された言葉 */
 .half, .face { display: grid; place-items: center; }

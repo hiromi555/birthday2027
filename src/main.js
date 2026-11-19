@@ -122,7 +122,8 @@ function render() {
   document.body.style.setProperty('--ink', pages[current].ink || '#333')
   document.body.style.setProperty('--text-color', pages[current].textColor || '#fff')
   counterEl.textContent = `${current + 1} / ${pages.length}`
-  prevBtn.disabled = current === 0
+  // 1枚目の「‹」は、表紙に戻るボタンになる
+  prevBtn.setAttribute('aria-label', current === 0 ? '表紙にもどる' : '前のページ')
 
   const isLast = current === last
   nextBtn.textContent = isLast ? 'とじる' : '›'
@@ -237,7 +238,7 @@ async function openBook() {
   busy = false
 }
 
-// 最後のページで本を閉じる
+// 本を閉じて表紙に戻る（最後のページの「とじる」と、1枚目の「‹」）
 async function closeBook() {
   if (busy || state !== 'open') return
   busy = true
@@ -333,8 +334,14 @@ function goNext() {
   else go(current + 1)
 }
 
+// 前へ（1枚目なら閉じて表紙に戻る）
+function goPrev() {
+  if (current === 0) closeBook()
+  else go(current - 1)
+}
+
 bookWrap.addEventListener('click', openBook)
-prevBtn.addEventListener('click', () => go(current - 1))
+prevBtn.addEventListener('click', goPrev)
 nextBtn.addEventListener('click', goNext)
 
 let startX = 0
@@ -344,7 +351,7 @@ $('stage').addEventListener('touchstart', (e) => {
 $('stage').addEventListener('touchend', (e) => {
   const diff = e.changedTouches[0].clientX - startX
   if (diff < -50) goNext()
-  if (diff > 50) go(current - 1)
+  if (diff > 50) goPrev()
 })
 
 // 画面の大きさが変わったら、表紙の大きさも合わせる
