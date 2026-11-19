@@ -49,24 +49,37 @@ export function smileys(svg) {
   const { width, height } = svg.getBoundingClientRect()
   const cx = width / 2
   const cy = height / 2
-  const count = Math.round(gsap.utils.clamp(14, 30, (width * height) / 22000))
+  const count = Math.round(gsap.utils.clamp(14, 30, (width * height) / 22000)) + 2
 
-  // 置く場所を決める（真ん中の文字のところと、スマイル同士の重なりはさける）
+  // 置く場所を決める（真ん中の文字のところはさける）
+  // 候補をいくつか出して「まわりのスマイルから一番遠い場所」を選ぶので、すき間ができにくい
   const spots = []
-  for (let tries = 0; spots.length < count && tries < 800; tries++) {
-    const s = r(0.7, 1.6) * Math.max(0.8, Math.min(width, height) / 600)
-    const x = r(width * 0.04, width * 0.96)
-    const y = r(height * 0.04, height * 0.86)
-    const onText = Math.abs(y - cy) < height * 0.12 && Math.abs(x - cx) < width * 0.45
-    const tooClose = spots.some((p) => Math.hypot(p.x - x, p.y - y) < (p.s + s) * 30 * 0.95)
-    if (!onText && !tooClose) spots.push({ x, y, s })
+  const sizeOf = () => r(0.7, 1.6) * Math.max(0.8, Math.min(width, height) / 600)
+  const free = (x, y) => !(Math.abs(y - cy) < height * 0.12 && Math.abs(x - cx) < width * 0.45)
+  for (let n = 0; n < count; n++) {
+    const s = sizeOf()
+    let best = null, bestGap = -Infinity
+    for (let t = 0; t < 40; t++) {
+      const x = r(width * 0.04, width * 0.96)
+      const y = r(height * 0.04, height * 0.86)
+      if (!free(x, y)) continue
+      // まわりのスマイルとのすき間（大きさも考える）
+      const gap = spots.length
+        ? Math.min(...spots.map((p) => Math.hypot(p.x - x, p.y - y) - (p.s + s) * 30))
+        : Infinity
+      if (gap > bestGap) { bestGap = gap; best = { x, y, s } }
+    }
+    if (best && bestGap > -12) spots.push(best)   // 少し重なるくらいまではOK
   }
+
+  // 色と顔は、かたよらないように同じくらいずつ用意してから、順番だけシャッフル
+  const deal = (list, n) => gsap.utils.shuffle(Array.from({ length: n }, (_, i) => list[i % list.length]))
+  const colors = deal(['#F7C21B', '#E63B2E', '#ffffff', '#F7C21B', '#E63B2E'], spots.length)
+  const faces = deal(['smile', 'wink', 'laugh'], spots.length)
 
   spots.forEach((p, i) => {
     const pos = make(svg, 'g', { transform: `translate(${p.x.toFixed(1)}, ${p.y.toFixed(1)})` })
-    const face = smiley(pos,
-      r(['#F7C21B', '#F7C21B', '#F7C21B', '#E63B2E', '#ffffff']),
-      r(['smile', 'wink', 'laugh']))
+    const face = smiley(pos, colors[i], faces[i])
     const tilt = r(-20, 20)
 
     // ポンッと出てくる（だんだん速く、次々に）

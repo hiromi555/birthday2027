@@ -27,8 +27,32 @@ export function popFireworks(svg) {
   const cy = height / 2
   const base = Math.min(width, height)
 
+  // 花火の場所：文字の上にアーチ状に並べる＋下に小さいのを2つ（book-version と同じ並べ方）
+  // s は場所ごとの大きさの倍率
+  const arch = width < 600 ? 5 : 7   // スマホは5つ、PCは7つ
+  const spots = []
+  for (let k = 0; k < arch; k++) {
+    const a = ((205 + (130 / (arch - 1)) * k) * Math.PI) / 180
+    spots.push({
+      x: cx + Math.cos(a) * width * 0.36,
+      y: cy - height * 0.05 + Math.sin(a) * height * 0.3,
+      s: k % 2 === 0 ? 1.1 : 0.9,
+    })
+  }
+  spots.push({ x: width * 0.22, y: height * 0.8, s: 0.7 })
+  spots.push({ x: width * 0.78, y: height * 0.82, s: 0.7 })
+
+  // 使っていない場所から、ランダムに1つ選ぶ（同じ場所で2つ同時に上がらないように）
+  const busySpots = new Set()
+  const take = (prev) => {
+    if (prev) busySpots.delete(prev)
+    const next = r(spots.filter((p) => !busySpots.has(p) && p !== prev))
+    busySpots.add(next)
+    return next
+  }
+
   for (let i = 0; i < 5; i++) {
-    const size = base * r(0.12, 0.18)           // 花火の大きさ
+    const size = base * 0.15                     // 花火の大きさ（場所ごとに s 倍）
     const color = COLORS[i % COLORS.length]
     const color2 = r(COLORS.filter((c) => c !== color))
 
@@ -52,15 +76,13 @@ export function popFireworks(svg) {
     }
     const core = make(fw, 'circle', { r: size * 0.16, fill: color2, stroke: INK, 'stroke-width': 4 })
 
-    // 上がる場所：真ん中の文字のあたりはさける
-    let x = 0, y = 0
+    // 上がる場所（毎回、空いている場所からランダムに）
+    let spot = null, x = 0, y = 0, sc = 1
     const pick = () => {
-      for (let t = 0; t < 30; t++) {
-        x = r(width * 0.12, width * 0.88)
-        y = r(height * 0.08, height * 0.82)
-        const onText = Math.abs(y - cy) < height * 0.12 + size * 0.5 && Math.abs(x - cx) < width * 0.42
-        if (!onText) break
-      }
+      spot = take(spot)
+      x = spot.x
+      y = spot.y
+      sc = spot.s
     }
     pick()
     gsap.set([ball, fw], { opacity: 0 })
@@ -78,7 +100,7 @@ export function popFireworks(svg) {
         { attr: { cy: () => y }, duration: 0.7, ease: 'power2.out', immediateRender: false })
       .set(ball, { opacity: 0 })
       // ② パーン！と広がる
-      .set(fw, { x: () => x, y: () => y, opacity: 1 })
+      .set(fw, { x: () => x, y: () => y, scale: () => sc, opacity: 1 })
       // （中心を基準に広げる。svgOrigin だとくり返すたびに位置がずれるので transformOrigin）
       .fromTo(rays, { scale: 0.1, rotation: 0, transformOrigin: '50% 50%' },
         { scale: 1, rotation: 12, duration: 0.6, ease: 'power3.out', immediateRender: false })
